@@ -2,24 +2,53 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TrapPlacer : MonoBehaviour
+public class GunManager : MonoBehaviour
 {
+    //Armas y Trampas
     public GameObject trapPrefab;
+
+    public GameObject Arma;
 
     public LayerMask blockLayer;
 
     private GameObject tempTrap;
+
+    //Bools
+    public bool NormalShot;
+    public bool BallShot;
+    public bool CanUseTrap = true;
+    public bool CanUseWeapon = true;
+    // Particulas
+    public ParticleSystem Disparo;
+    public GameObject Disparo_Particle;
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.T) && CanUseTrap == true)
         {
+            CanUseWeapon = false;
             TryPlaceTrap();
         }
         if(tempTrap != null)
         {
             ControlTrap();
         }    
+
+        if(Input.GetKeyDown(KeyCode.Alpha1) && CanUseWeapon == true)
+        {
+            CanUseTrap = false;
+            StartCoroutine(ShotNormalShot());
+        }
+    }
+
+    IEnumerator ShotNormalShot()
+    {
+        Disparo_Particle.SetActive(true);
+        Disparo.Play();
+        CanUseWeapon = false;
+        yield return new WaitForSeconds(0.5f);
+        CanUseWeapon = true;
+        CanUseTrap = true;
     }
 
     void TryPlaceTrap()
@@ -41,6 +70,8 @@ public class TrapPlacer : MonoBehaviour
         {
             tempTrap.GetComponent<Trap>().Place();
             tempTrap = null;
+            CanUseTrap = true;
+            CanUseWeapon = true;
         }
     }
 
